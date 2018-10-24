@@ -299,7 +299,6 @@ def create_rg_graph (graph_order, radius, file_name) :
         raw_output = str(subprocess.check_output(["neato", "-Tdot", "tmp.dot"]))
         for row in raw_output.split("subgraph") :
             splitted_row = [word for word in row.split("\\t") if len(word) > 0]
-            print(splitted_row)
             try :
                 v = int(splitted_row[1])
                 graph.vs[v]["x"] = float(splitted_row[3].split("\"")[1].split(",")[0])
@@ -363,7 +362,6 @@ def k_hop_vertices (graph, vertex, k) :
     
     # List for convenience
     vertices = list(vertices)
-    print(k, vertex, vertices)
     return vertices
 
 ####################################################################################################################################################################################################################################
