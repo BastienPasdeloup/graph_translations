@@ -79,7 +79,7 @@ NB_HOPS_V2 = 1
 """
 
 ### CODE ###
-RANDOM_SEED = range(40)
+RANDOM_SEED = range(31)
 
 ####################################################################################################################################################################################################################################
 
@@ -327,6 +327,9 @@ def create_rg_graph (graph_order, radius, file_name) :
     file_object.write("\\end{tikzpicture}")
     file_object.close()
     
+    # We compute the shortest paths once and for all
+    graph["shortest_paths"] = graph.shortest_paths_dijkstra()
+        
     # Done
     return graph
     
@@ -360,6 +363,7 @@ def k_hop_vertices (graph, vertex, k) :
     
     # List for convenience
     vertices = list(vertices)
+    print(k, vertex, vertices)
     return vertices
 
 ####################################################################################################################################################################################################################################
@@ -474,11 +478,6 @@ def ec_violations (approximate_translation, graph) :
 @timeit
 def deformation (approximate_translation, graph) :
 
-    # We compute the shortest paths if not done once and for all
-    global all_shortest_paths
-    if "all_shortest_paths" not in globals() :
-        all_shortest_paths = graph.shortest_paths_dijkstra()
-
     # Non-lost vertices
     translation_support = [v for v in approximate_translation if approximate_translation[v] is not None]
     nb_non_lost = len(translation_support)
@@ -489,7 +488,7 @@ def deformation (approximate_translation, graph) :
         v1 = translation_support[i1]
         for i2 in range(i1 + 1, nb_non_lost) :
             v2 = translation_support[i2]
-            total_deformation += abs(all_shortest_paths[v1][v2] - all_shortest_paths[approximate_translation[v1]][approximate_translation[v2]])
+            total_deformation += abs(graph["shortest_paths"][v1][v2] - graph["shortest_paths"][approximate_translation[v1]][approximate_translation[v2]])
     
     # Average
     average_deformation = 0.0 if nb_non_lost <= 1 else float(total_deformation) / float(nb_non_lost * (nb_non_lost - 1.0) / 2.0)
@@ -696,7 +695,7 @@ def minimize_score (v1, v2, graph, V1, V2, alpha, beta, gamma, k) :
 ### CODE ###
 @timeit
 def main () :
-        
+    
     # We iterate over all asked seeds
     for seed in RANDOM_SEED :
 
